@@ -1,0 +1,59 @@
+.schedule-section {
+  background: #fff;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 24px;
+  border: 1px solid #e8f5e9;
+}
+
+.schedule-section-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #1a5c2a;
+  margin: 0 0 16px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.schedule-list { display: flex; flex-direction: column; gap: 10px; }
+
+.schedule-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 16px;
+  border-radius: 10px;
+  border: 1px solid transparent;
+}
+
+.schedule-item--overdue { background: #fff5f5; border-color: #ffcdd2; }
+.schedule-item--due { background: #fffbf0; border-color: #ffe082; }
+
+.schedule-item-info { display: flex; flex-direction: column; gap: 3px; flex: 1; }
+
+.schedule-item-name {
+  font-weight: 700;
+  color: #1a5c2a;
+  text-decoration: none;
+  font-size: 0.95rem;
+}
+.schedule-item-name:hover { text-decoration: underline; }
+
+.schedule-item-meta { font-size: 0.82rem; color: #666; }
+.schedule-item-date { font-size: 0.8rem; color: #999; }
+
+.water-btn {
+  padding: 8px 16px;
+  background: #2d7a3e;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.2s;
+  flex-shrink: 0;
+}
+.water-btn:hover { background: #1a5c2a; }

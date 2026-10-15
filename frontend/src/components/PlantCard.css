@@ -1,0 +1,129 @@
+.plant-card {
+  background: #fff;
+  border-radius: 12px;
+  border: 1px solid #e8f5e9;
+  overflow: hidden;
+  transition: transform 0.2s, box-shadow 0.2s;
+  display: flex;
+  flex-direction: column;
+}
+
+.plant-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(45,122,62,0.15);
+}
+
+.plant-card--overdue {
+  border-color: #ffcdd2;
+  background: #fffbfb;
+}
+
+.plant-card-link {
+  display: flex;
+  gap: 16px;
+  padding: 16px;
+  text-decoration: none;
+  color: inherit;
+  flex: 1;
+  align-items: flex-start;
+}
+
+.plant-card-emoji {
+  font-size: 2.5rem;
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f1f8e9;
+  border-radius: 12px;
+  flex-shrink: 0;
+}
+
+.plant-card-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.plant-card-name {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #1a5c2a;
+  margin: 0 0 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.plant-card-species {
+  font-size: 0.8rem;
+  color: #666;
+  font-style: italic;
+  margin: 0 0 4px;
+}
+
+.plant-card-location {
+  font-size: 0.8rem;
+  color: #888;
+  margin: 0 0 8px;
+}
+
+.plant-card-meta {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 6px;
+}
+
+.plant-card-status {
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 20px;
+}
+
+.status--ok { background: #e8f5e9; color: #2d7a3e; }
+.status--due { background: #fff3e0; color: #e65100; }
+.status--overdue { background: #ffebee; color: #c62828; }
+
+.plant-card-type {
+  font-size: 0.72rem;
+  color: #666;
+  padding: 2px 8px;
+  background: #f5f5f5;
+  border-radius: 20px;
+}
+
+.plant-card-next-water {
+  font-size: 0.78rem;
+  color: #555;
+  margin: 0;
+}
+
+.plant-card-actions {
+  display: flex;
+  gap: 8px;
+  padding: 12px 16px;
+  border-top: 1px solid #f0f0f0;
+  background: #fafafa;
+}
+
+.btn {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: opacity 0.2s;
+}
+
+.btn:hover { opacity: 0.85; }
+
+.btn-water { background: #e3f2fd; color: #1565c0; }
+.btn-edit { background: #f3e5f5; color: #6a1b9a; }
+.btn-delete { background: #ffebee; color: #c62828; }
