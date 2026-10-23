@@ -106,3 +106,4 @@ Polymorphism allows objects of different classes to be treated through a uniform
 | **Collections** | `PlantService`, `OopDemonstrationTest` | `List<Plant>`, `ArrayList<Plant>`, Stream API filtering |
 | **Exception Handling** | `PlantNotFoundException`, `GlobalExceptionHandler` | Custom unchecked exception, `@RestControllerAdvice` handling |
 | **Separation of Concerns** | Layered Package Structure | Model ↔ DTO ↔ Repository ↔ Service ↔ Controller |
+

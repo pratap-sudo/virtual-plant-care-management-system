@@ -52,3 +52,4 @@ cd backend
 | **TC-UI-06** | Care Schedule | Click "Water Now" on overdue item | Item is watered and immediately clears from overdue list. |
 | **TC-UI-07** | Care History | Add care activity | Activity appended to chronological timeline with corresponding icon. |
 | **TC-UI-08** | Plant Guide | Browse houseplant guides | Displays 5 common indoor plant guides with difficulty badges and care recommendations. |
+

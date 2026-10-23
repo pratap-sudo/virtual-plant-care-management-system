@@ -98,3 +98,4 @@ erDiagram
 1. **Self-Contained Maven Wrapper**: `mvnw.cmd` automatically bootstraps the Maven runtime on demand.
 2. **Standardized Environment Variables**: Avoids hardcoded connection strings or local file paths.
 3. **Cross-Origin Configuration**: `CorsConfig` is configured to authorize local development ports (5173, 3000) while keeping production extensible.
+

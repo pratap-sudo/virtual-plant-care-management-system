@@ -18,3 +18,4 @@ Write-Host ""
 
 Set-Location -Path "$PSScriptRoot\backend"
 .\mvnw.cmd spring-boot:run
+
