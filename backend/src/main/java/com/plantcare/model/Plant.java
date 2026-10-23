@@ -66,6 +66,18 @@ public abstract class Plant {
     @Column(name = "general_notes", columnDefinition = "TEXT")
     private String generalNotes;
 
+    @Column(name = "image_url", columnDefinition = "TEXT")
+    private String imageUrl;
+
+    @Column(name = "health_status", length = 30)
+    private String healthStatus = "HEALTHY";
+
+    @Column(name = "fertilizing_interval_days")
+    private Integer fertilizingIntervalDays;
+
+    @Column(name = "last_fertilized_date")
+    private LocalDate lastFertilizedDate;
+
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
@@ -125,6 +137,26 @@ public abstract class Plant {
 
     public boolean isDueForWateringToday() {
         return getNextWateringDate().isEqual(LocalDate.now());
+    }
+
+    public LocalDate getNextFertilizingDate() {
+        if (fertilizingIntervalDays == null || fertilizingIntervalDays <= 0) {
+            return null;
+        }
+        if (lastFertilizedDate == null) {
+            return LocalDate.now();
+        }
+        return lastFertilizedDate.plusDays(fertilizingIntervalDays);
+    }
+
+    public boolean isDueForFertilizingToday() {
+        LocalDate next = getNextFertilizingDate();
+        return next != null && next.isEqual(LocalDate.now());
+    }
+
+    public boolean isOverdueForFertilizing() {
+        LocalDate next = getNextFertilizingDate();
+        return next != null && next.isBefore(LocalDate.now());
     }
 
     // ============================================================
@@ -208,5 +240,37 @@ public abstract class Plant {
 
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
+
+    public String getHealthStatus() {
+        return healthStatus;
+    }
+
+    public void setHealthStatus(String healthStatus) {
+        this.healthStatus = (healthStatus != null && !healthStatus.isBlank()) ? healthStatus : "HEALTHY";
+    }
+
+    public Integer getFertilizingIntervalDays() {
+        return fertilizingIntervalDays;
+    }
+
+    public void setFertilizingIntervalDays(Integer fertilizingIntervalDays) {
+        this.fertilizingIntervalDays = fertilizingIntervalDays;
+    }
+
+    public LocalDate getLastFertilizedDate() {
+        return lastFertilizedDate;
+    }
+
+    public void setLastFertilizedDate(LocalDate lastFertilizedDate) {
+        this.lastFertilizedDate = lastFertilizedDate;
     }
 }

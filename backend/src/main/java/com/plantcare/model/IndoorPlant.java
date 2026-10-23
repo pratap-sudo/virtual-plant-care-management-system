@@ -1,6 +1,7 @@
 package com.plantcare.model;
 
 import jakarta.persistence.*;
+import java.time.LocalDate;
 
 /**
  * ============================================================
@@ -27,6 +28,9 @@ public class IndoorPlant extends Plant {
 
     @Column(name = "repotting_interval_months")
     private Integer repottingIntervalMonths;
+
+    @Column(name = "last_repotted_date")
+    private LocalDate lastRepottedDate;
 
     // Default constructor for JPA
     public IndoorPlant() {
@@ -96,5 +100,28 @@ public class IndoorPlant extends Plant {
 
     public void setRepottingIntervalMonths(Integer repottingIntervalMonths) {
         this.repottingIntervalMonths = repottingIntervalMonths;
+    }
+
+    public LocalDate getLastRepottedDate() {
+        return lastRepottedDate;
+    }
+
+    public void setLastRepottedDate(LocalDate lastRepottedDate) {
+        this.lastRepottedDate = lastRepottedDate;
+    }
+
+    public LocalDate getNextRepottingDate() {
+        if (repottingIntervalMonths == null || repottingIntervalMonths <= 0) {
+            return null;
+        }
+        if (lastRepottedDate == null) {
+            return LocalDate.now();
+        }
+        return lastRepottedDate.plusMonths(repottingIntervalMonths);
+    }
+
+    public boolean isDueForRepotting() {
+        LocalDate next = getNextRepottingDate();
+        return next != null && !next.isAfter(LocalDate.now());
     }
 }

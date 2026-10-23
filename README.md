@@ -268,9 +268,14 @@ VirtualPlantCare/
 | PUT | `/api/plants/{id}` | Update plant |
 | DELETE | `/api/plants/{id}` | Delete plant |
 | POST | `/api/plants/{id}/water` | Record watering |
+| POST | `/api/plants/{id}/fertilize` | Record fertilizing |
+| POST | `/api/plants/{id}/repot` | Record repotting (Indoor plants) |
+| PATCH | `/api/plants/{id}/health` | Update health status & log milestone |
 | GET | `/api/plants/due-today` | Plants due for watering today |
-| GET | `/api/plants/overdue` | Overdue plants |
-| GET | `/api/dashboard` | Dashboard statistics |
+| GET | `/api/plants/overdue` | Overdue watering plants |
+| GET | `/api/plants/due-fertilizing` | Plants due for fertilizer |
+| GET | `/api/plants/due-repotting` | Indoor plants due for repotting |
+| GET | `/api/dashboard` | Dashboard statistics (care, health, breakdown) |
 | GET | `/api/activities` | All care activities |
 | POST | `/api/activities` | Record care activity |
 | GET | `/api/activities/plant/{id}` | Activities for one plant |

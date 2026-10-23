@@ -12,8 +12,9 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * REST controller for Plant CRUD operations.
- * All business logic is delegated to PlantService.
+ * REST controller for Plant CRUD and care schedule operations.
+ * Specific static sub-paths are declared before parameterized {id} paths,
+ * with numeric regex {id:[0-9]+} to prevent string routing ambiguity.
  *
  * Base URL: /api/plants
  */
@@ -44,8 +45,32 @@ public class PlantController {
         return ResponseEntity.ok(plants);
     }
 
-    /** GET /api/plants/{id} — Get a single plant by ID */
-    @GetMapping("/{id}")
+    /** GET /api/plants/due-today — Plants due for watering today */
+    @GetMapping("/due-today")
+    public ResponseEntity<List<PlantResponseDTO>> getPlantsDueToday() {
+        return ResponseEntity.ok(plantService.getPlantsDueToday());
+    }
+
+    /** GET /api/plants/overdue — Plants overdue for watering */
+    @GetMapping("/overdue")
+    public ResponseEntity<List<PlantResponseDTO>> getOverduePlants() {
+        return ResponseEntity.ok(plantService.getOverduePlants());
+    }
+
+    /** GET /api/plants/due-fertilizing — Plants due for fertilizing */
+    @GetMapping("/due-fertilizing")
+    public ResponseEntity<List<PlantResponseDTO>> getDueFertilizing() {
+        return ResponseEntity.ok(plantService.getPlantsDueForFertilizing());
+    }
+
+    /** GET /api/plants/due-repotting — Plants due for repotting */
+    @GetMapping("/due-repotting")
+    public ResponseEntity<List<PlantResponseDTO>> getDueRepotting() {
+        return ResponseEntity.ok(plantService.getPlantsDueForRepotting());
+    }
+
+    /** GET /api/plants/{id} — Get a single plant by numeric ID */
+    @GetMapping("/{id:[0-9]+}")
     public ResponseEntity<PlantResponseDTO> getPlantById(@PathVariable Long id) {
         return ResponseEntity.ok(plantService.getPlantById(id));
     }
@@ -58,7 +83,7 @@ public class PlantController {
     }
 
     /** PUT /api/plants/{id} — Update a plant */
-    @PutMapping("/{id}")
+    @PutMapping("/{id:[0-9]+}")
     public ResponseEntity<PlantResponseDTO> updatePlant(
             @PathVariable Long id,
             @Valid @RequestBody PlantRequestDTO dto) {
@@ -66,14 +91,14 @@ public class PlantController {
     }
 
     /** DELETE /api/plants/{id} — Delete a plant (and its care history) */
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/{id:[0-9]+}")
     public ResponseEntity<Map<String, String>> deletePlant(@PathVariable Long id) {
         plantService.deletePlant(id);
         return ResponseEntity.ok(Map.of("message", "Plant deleted successfully"));
     }
 
     /** POST /api/plants/{id}/water — Record watering */
-    @PostMapping("/{id}/water")
+    @PostMapping("/{id:[0-9]+}/water")
     public ResponseEntity<PlantResponseDTO> waterPlant(
             @PathVariable Long id,
             @RequestBody(required = false) Map<String, String> body) {
@@ -81,15 +106,31 @@ public class PlantController {
         return ResponseEntity.ok(plantService.recordWatering(id, notes));
     }
 
-    /** GET /api/plants/due-today — Plants due for watering today */
-    @GetMapping("/due-today")
-    public ResponseEntity<List<PlantResponseDTO>> getPlantsDueToday() {
-        return ResponseEntity.ok(plantService.getPlantsDueToday());
+    /** POST /api/plants/{id}/fertilize — Record fertilizing */
+    @PostMapping("/{id:[0-9]+}/fertilize")
+    public ResponseEntity<PlantResponseDTO> fertilizePlant(
+            @PathVariable Long id,
+            @RequestBody(required = false) Map<String, String> body) {
+        String notes = body != null ? body.get("notes") : null;
+        return ResponseEntity.ok(plantService.recordFertilizing(id, notes));
     }
 
-    /** GET /api/plants/overdue — Plants overdue for watering */
-    @GetMapping("/overdue")
-    public ResponseEntity<List<PlantResponseDTO>> getOverduePlants() {
-        return ResponseEntity.ok(plantService.getOverduePlants());
+    /** POST /api/plants/{id}/repot — Record repotting */
+    @PostMapping("/{id:[0-9]+}/repot")
+    public ResponseEntity<PlantResponseDTO> repotPlant(
+            @PathVariable Long id,
+            @RequestBody(required = false) Map<String, String> body) {
+        String notes = body != null ? body.get("notes") : null;
+        return ResponseEntity.ok(plantService.recordRepotting(id, notes));
+    }
+
+    /** PATCH /api/plants/{id}/health — Update health status & record milestone */
+    @PatchMapping("/{id:[0-9]+}/health")
+    public ResponseEntity<PlantResponseDTO> updateHealthStatus(
+            @PathVariable Long id,
+            @RequestBody Map<String, String> body) {
+        String status = body != null ? body.get("healthStatus") : "HEALTHY";
+        String note = body != null ? body.get("notes") : null;
+        return ResponseEntity.ok(plantService.updateHealthStatus(id, status, note));
     }
 }

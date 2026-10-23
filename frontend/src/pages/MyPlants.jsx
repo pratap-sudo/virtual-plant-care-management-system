@@ -2,17 +2,21 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { plantAPI } from '../services/api';
 import { usePlants } from '../hooks/usePlants';
+import { useToast } from '../context/ToastContext';
+import { exportPlantsToCsv } from '../utils/exportCsv';
 import PlantCard from '../components/PlantCard';
+import ConfirmModal from '../components/ConfirmModal';
 import LoadingSpinner from '../components/LoadingSpinner';
 import EmptyState from '../components/EmptyState';
-import Alert from '../components/Alert';
 import './MyPlants.css';
 
 export default function MyPlants() {
   const [search, setSearch] = useState('');
   const [typeFilter, setTypeFilter] = useState('');
-  const [successMsg, setSuccessMsg] = useState('');
-  const [errorMsg, setErrorMsg] = useState('');
+  const [plantToDelete, setPlantToDelete] = useState(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const toast = useToast();
 
   const params = {};
   if (search) params.search = search;
@@ -20,26 +24,43 @@ export default function MyPlants() {
 
   const { plants, loading, error, refetch } = usePlants(params);
 
-  const handleDelete = async (id) => {
+  const handleDeleteRequest = (plant) => {
+    setPlantToDelete(plant);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!plantToDelete) return;
+    setIsDeleting(true);
     try {
-      await plantAPI.delete(id);
-      setSuccessMsg('Plant deleted successfully.');
-      setErrorMsg('');
+      await plantAPI.delete(plantToDelete.id);
+      toast.success(`"${plantToDelete.name}" deleted successfully.`);
+      setPlantToDelete(null);
       refetch();
     } catch (err) {
-      setErrorMsg(err.message);
+      toast.error(err.message || 'Failed to delete plant');
+    } finally {
+      setIsDeleting(false);
     }
   };
 
   const handleWater = async (id) => {
     try {
       await plantAPI.water(id);
-      setSuccessMsg('Watering recorded! 💧');
-      setErrorMsg('');
+      const wateredPlant = plants.find(p => p.id === id);
+      toast.success(wateredPlant ? `Watered "${wateredPlant.name}"! 💧` : 'Watering recorded! 💧');
       refetch();
     } catch (err) {
-      setErrorMsg(err.message);
+      toast.error(err.message || 'Failed to record watering');
     }
+  };
+
+  const handleExport = () => {
+    if (plants.length === 0) {
+      toast.info('No plants in collection to export.');
+      return;
+    }
+    exportPlantsToCsv(plants, `plant-collection-${new Date().toISOString().split('T')[0]}.csv`);
+    toast.success(`Exported ${plants.length} plant(s) to CSV! 📥`);
   };
 
   return (
@@ -49,12 +70,15 @@ export default function MyPlants() {
           <h1 className="page-title">🌿 My Plants</h1>
           <p className="page-subtitle">{plants.length} plant(s) in your collection</p>
         </div>
-        <Link to="/plants/new" className="btn-primary">➕ Add Plant</Link>
+        <div className="myplants-header-actions">
+          {plants.length > 0 && (
+            <button className="btn-secondary" onClick={handleExport} title="Export collection to CSV">
+              📥 Export CSV
+            </button>
+          )}
+          <Link to="/plants/new" className="btn-primary">➕ Add Plant</Link>
+        </div>
       </div>
-
-      <Alert type="success" message={successMsg} onClose={() => setSuccessMsg('')} />
-      <Alert type="error" message={errorMsg} onClose={() => setErrorMsg('')} />
-      {error && <Alert type="error" message={`Failed to load plants: ${error}`} />}
 
       {/* Search & Filter Bar */}
       <div className="filter-bar">
@@ -84,6 +108,13 @@ export default function MyPlants() {
       {/* Content */}
       {loading ? (
         <LoadingSpinner message="Loading your plants..." />
+      ) : error ? (
+        <EmptyState
+          icon="⚠️"
+          title="Failed to load plants"
+          message={error}
+          action={<button className="btn-secondary" onClick={refetch}>🔄 Try Again</button>}
+        />
       ) : plants.length === 0 ? (
         <EmptyState
           icon="🌱"
@@ -97,12 +128,24 @@ export default function MyPlants() {
             <PlantCard
               key={plant.id}
               plant={plant}
-              onDelete={handleDelete}
+              onDelete={handleDeleteRequest}
               onWater={handleWater}
             />
           ))}
         </div>
       )}
+
+      {/* Custom Delete Confirmation Modal */}
+      <ConfirmModal
+        isOpen={Boolean(plantToDelete)}
+        title="Delete Plant"
+        message={`Are you sure you want to delete "${plantToDelete?.name}"? All associated care history, milestones, and reminders will be permanently removed.`}
+        confirmText="Delete Plant"
+        isDanger={true}
+        loading={isDeleting}
+        onConfirm={handleConfirmDelete}
+        onCancel={() => setPlantToDelete(null)}
+      />
     </div>
   );
 }

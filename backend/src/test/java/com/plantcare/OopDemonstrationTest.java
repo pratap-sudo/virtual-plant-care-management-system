@@ -142,4 +142,40 @@ public class OopDemonstrationTest {
         assertEquals(1, outdoorCount);
         System.out.println("✅ COLLECTIONS: ArrayList stores mixed Plant subtypes correctly.");
     }
+
+    @Test
+    @DisplayName("Health Status & Fertilizing / Repotting schedule calculation")
+    void testHealthAndExtendedCareSchedule() {
+        IndoorPlant plant = new IndoorPlant("Monstera", "Monstera deliciosa", "Living Room", 7, "Bright Indirect", "High");
+        plant.setHealthStatus("THRIVING");
+        plant.setImageUrl("https://images.unsplash.com/photo-1614594975525-e45190c55d0b");
+        plant.setFertilizingIntervalDays(30);
+        plant.setRepottingIntervalMonths(12);
+
+        assertEquals("THRIVING", plant.getHealthStatus());
+        assertNotNull(plant.getImageUrl());
+
+        // Fertilized 10 days ago (30-day interval) -> not due yet
+        plant.setLastFertilizedDate(LocalDate.now().minusDays(10));
+        assertFalse(plant.isDueForFertilizingToday());
+        assertFalse(plant.isOverdueForFertilizing());
+
+        // Fertilized 30 days ago -> due today
+        plant.setLastFertilizedDate(LocalDate.now().minusDays(30));
+        assertTrue(plant.isDueForFertilizingToday());
+
+        // Fertilized 35 days ago -> overdue
+        plant.setLastFertilizedDate(LocalDate.now().minusDays(35));
+        assertTrue(plant.isOverdueForFertilizing());
+
+        // Repotted 6 months ago (12-month interval) -> not due
+        plant.setLastRepottedDate(LocalDate.now().minusMonths(6));
+        assertFalse(plant.isDueForRepotting());
+
+        // Repotted 13 months ago -> due for repotting
+        plant.setLastRepottedDate(LocalDate.now().minusMonths(13));
+        assertTrue(plant.isDueForRepotting());
+
+        System.out.println("✅ EXTENDED CARE: Health status, fertilizing & repotting calculations verified.");
+    }
 }

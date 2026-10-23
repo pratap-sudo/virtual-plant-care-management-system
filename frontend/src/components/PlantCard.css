@@ -1,21 +1,22 @@
 .plant-card {
-  background: #fff;
+  background: var(--bg-card);
   border-radius: 12px;
-  border: 1px solid #e8f5e9;
+  border: 1px solid var(--border-card);
   overflow: hidden;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
   display: flex;
   flex-direction: column;
 }
 
 .plant-card:hover {
   transform: translateY(-3px);
-  box-shadow: 0 8px 24px rgba(45,122,62,0.15);
+  box-shadow: 0 8px 24px rgba(45, 122, 62, 0.15);
+  border-color: var(--primary-green);
 }
 
 .plant-card--overdue {
-  border-color: #ffcdd2;
-  background: #fffbfb;
+  border-color: #fca5a5;
+  background: var(--bg-card);
 }
 
 .plant-card-link {
@@ -28,16 +29,33 @@
   align-items: flex-start;
 }
 
-.plant-card-emoji {
-  font-size: 2.5rem;
-  width: 56px;
-  height: 56px;
+.plant-card-media {
+  width: 72px;
+  height: 72px;
+  border-radius: 12px;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: var(--primary-light);
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #f1f8e9;
-  border-radius: 12px;
-  flex-shrink: 0;
+  position: relative;
+}
+
+.plant-card-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.plant-card-emoji-fallback {
+  width: 100%;
+  height: 100%;
+  font-size: 2.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--primary-light);
 }
 
 .plant-card-info {
@@ -45,32 +63,54 @@
   min-width: 0;
 }
 
+.plant-card-top-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 2px;
+}
+
 .plant-card-name {
-  font-size: 1rem;
+  font-size: 1.05rem;
   font-weight: 700;
-  color: #1a5c2a;
-  margin: 0 0 2px;
+  color: var(--text-heading);
+  margin: 0;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
+.plant-card-health {
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 9999px;
+  white-space: nowrap;
+}
+
+.health--thriving { background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; }
+.health--healthy { background: #f0fdf4; color: #166534; border: 1px solid #dcfce7; }
+.health--warning { background: #fef3c7; color: #b45309; border: 1px solid #fde68a; }
+.health--sick { background: #fee2e2; color: #b91c1c; border: 1px solid #fecaca; }
+.health--dormant { background: #ede9fe; color: #6d28d9; border: 1px solid #ddd6fe; }
+
 .plant-card-species {
   font-size: 0.8rem;
-  color: #666;
+  color: var(--text-muted);
   font-style: italic;
   margin: 0 0 4px;
 }
 
 .plant-card-location {
   font-size: 0.8rem;
-  color: #888;
+  color: var(--text-muted);
   margin: 0 0 8px;
 }
 
 .plant-card-meta {
   display: flex;
-  gap: 8px;
+  gap: 6px;
   flex-wrap: wrap;
   margin-bottom: 6px;
 }
@@ -82,48 +122,93 @@
   border-radius: 20px;
 }
 
-.status--ok { background: #e8f5e9; color: #2d7a3e; }
-.status--due { background: #fff3e0; color: #e65100; }
-.status--overdue { background: #ffebee; color: #c62828; }
+.status--ok { background: #dcfce7; color: #166534; }
+.status--due { background: #fef3c7; color: #b45309; }
+.status--overdue { background: #fee2e2; color: #b91c1c; }
 
 .plant-card-type {
   font-size: 0.72rem;
-  color: #666;
+  color: var(--text-muted);
   padding: 2px 8px;
-  background: #f5f5f5;
+  background: var(--bg-card-subtle);
+  border: 1px solid var(--border-light);
   border-radius: 20px;
+}
+
+.plant-card-pill {
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 20px;
+}
+
+.pill--fertilize {
+  background: #ecfdf5;
+  color: #047857;
+  border: 1px solid #a7f3d0;
+}
+
+.pill--repot {
+  background: #fdf4ff;
+  color: #a21caf;
+  border: 1px solid #f5d0fe;
 }
 
 .plant-card-next-water {
   font-size: 0.78rem;
-  color: #555;
+  color: var(--text-muted);
   margin: 0;
 }
 
 .plant-card-actions {
   display: flex;
-  gap: 8px;
-  padding: 12px 16px;
-  border-top: 1px solid #f0f0f0;
-  background: #fafafa;
+  border-top: 1px solid var(--border-light);
+  background: var(--bg-card-subtle);
 }
 
-.btn {
-  padding: 6px 12px;
-  border: none;
-  border-radius: 8px;
-  font-size: 0.82rem;
+.plant-card-actions .btn {
+  flex: 1;
+  padding: 8px 10px;
+  font-size: 0.8rem;
   font-weight: 600;
+  border: none;
+  background: transparent;
   cursor: pointer;
+  transition: background 0.15s, color 0.15s;
   text-decoration: none;
-  display: inline-flex;
+  display: flex;
   align-items: center;
-  gap: 4px;
-  transition: opacity 0.2s;
+  justify-content: center;
+  color: var(--text-main);
 }
 
-.btn:hover { opacity: 0.85; }
+.plant-card-actions .btn:hover {
+  background: var(--bg-card);
+}
 
-.btn-water { background: #e3f2fd; color: #1565c0; }
-.btn-edit { background: #f3e5f5; color: #6a1b9a; }
-.btn-delete { background: #ffebee; color: #c62828; }
+.btn-water {
+  color: #0284c7 !important;
+}
+
+.btn-water:hover {
+  background: rgba(2, 132, 199, 0.12) !important;
+}
+
+.btn-edit {
+  color: var(--text-muted) !important;
+  border-left: 1px solid var(--border-light);
+  border-right: 1px solid var(--border-light);
+}
+
+.btn-edit:hover {
+  color: var(--text-main) !important;
+}
+
+.btn-delete {
+  color: #ef4444 !important;
+  flex: 0 0 40px !important;
+}
+
+.btn-delete:hover {
+  background: rgba(239, 68, 68, 0.12) !important;
+}

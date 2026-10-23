@@ -12,8 +12,16 @@ public class DashboardStatsDTO {
     private long outdoorPlants;
     private long plantsNeedingWateringToday;
     private long overdueWateringCount;
+    private long plantsNeedingFertilizingCount;
+    private long plantsNeedingRepottingCount;
+    private long thrivingCount;
+    private long healthyCount;
+    private long needsAttentionCount;
+    private long sickCount;
     private List<PlantResponseDTO> plantsNeedingWatering;
     private List<PlantResponseDTO> overduePlants;
+    private List<PlantResponseDTO> plantsNeedingFertilizing;
+    private List<PlantResponseDTO> plantsNeedingRepotting;
     private List<CareActivityResponseDTO> recentActivities;
 
     public DashboardStatsDTO() {
@@ -96,5 +104,69 @@ public class DashboardStatsDTO {
 
     public void setRecentActivities(List<CareActivityResponseDTO> recentActivities) {
         this.recentActivities = recentActivities;
+    }
+
+    public long getPlantsNeedingFertilizingCount() {
+        return plantsNeedingFertilizingCount;
+    }
+
+    public void setPlantsNeedingFertilizingCount(long plantsNeedingFertilizingCount) {
+        this.plantsNeedingFertilizingCount = plantsNeedingFertilizingCount;
+    }
+
+    public long getPlantsNeedingRepottingCount() {
+        return plantsNeedingRepottingCount;
+    }
+
+    public void setPlantsNeedingRepottingCount(long plantsNeedingRepottingCount) {
+        this.plantsNeedingRepottingCount = plantsNeedingRepottingCount;
+    }
+
+    public long getThrivingCount() {
+        return thrivingCount;
+    }
+
+    public void setThrivingCount(long thrivingCount) {
+        this.thrivingCount = thrivingCount;
+    }
+
+    public long getHealthyCount() {
+        return healthyCount;
+    }
+
+    public void setHealthyCount(long healthyCount) {
+        this.healthyCount = healthyCount;
+    }
+
+    public long getNeedsAttentionCount() {
+        return needsAttentionCount;
+    }
+
+    public void setNeedsAttentionCount(long needsAttentionCount) {
+        this.needsAttentionCount = needsAttentionCount;
+    }
+
+    public long getSickCount() {
+        return sickCount;
+    }
+
+    public void setSickCount(long sickCount) {
+        this.sickCount = sickCount;
+    }
+
+    public List<PlantResponseDTO> getPlantsNeedingFertilizing() {
+        return plantsNeedingFertilizing;
+    }
+
+    public void setPlantsNeedingFertilizing(List<PlantResponseDTO> plantsNeedingFertilizing) {
+        this.plantsNeedingFertilizing = plantsNeedingFertilizing;
+    }
+
+    public List<PlantResponseDTO> getPlantsNeedingRepotting() {
+        return plantsNeedingRepotting;
+    }
+
+    public void setPlantsNeedingRepotting(List<PlantResponseDTO> plantsNeedingRepotting) {
+        this.plantsNeedingRepotting = plantsNeedingRepotting;
     }
 }

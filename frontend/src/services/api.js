@@ -48,11 +48,26 @@ export const plantAPI = {
   // POST /api/plants/:id/water
   water: (id, notes = '') => api.post(`/plants/${id}/water`, { notes }),
 
+  // POST /api/plants/:id/fertilize
+  fertilize: (id, notes = '') => api.post(`/plants/${id}/fertilize`, { notes }),
+
+  // POST /api/plants/:id/repot
+  repot: (id, notes = '') => api.post(`/plants/${id}/repot`, { notes }),
+
+  // PATCH /api/plants/:id/health
+  updateHealth: (id, healthStatus, notes = '') => api.patch(`/plants/${id}/health`, { healthStatus, notes }),
+
   // GET /api/plants/due-today
   getDueToday: () => api.get('/plants/due-today'),
 
   // GET /api/plants/overdue
   getOverdue: () => api.get('/plants/overdue'),
+
+  // GET /api/plants/due-fertilizing
+  getDueFertilizing: () => api.get('/plants/due-fertilizing'),
+
+  // GET /api/plants/due-repotting
+  getDueRepotting: () => api.get('/plants/due-repotting'),
 };
 
 // ============================================================

@@ -7,11 +7,20 @@ const PLANT_EMOJIS = {
   'snake plant': '🌿',
   'spider plant': '🕷️',
   'peace lily': '🌸',
+  'monstera': '🪴',
   'rose': '🌹',
   'sunflower': '🌻',
   'cactus': '🌵',
   'orchid': '🌺',
   'fern': '🌿',
+};
+
+const HEALTH_INFO = {
+  THRIVING: { label: '🌟 Thriving', cls: 'health--thriving' },
+  HEALTHY: { label: '💚 Healthy', cls: 'health--healthy' },
+  NEEDS_ATTENTION: { label: '⚠️ Needs Care', cls: 'health--warning' },
+  SICK: { label: '🥀 Unwell', cls: 'health--sick' },
+  DORMANT: { label: '💤 Dormant', cls: 'health--dormant' },
 };
 
 function getPlantEmoji(name) {
@@ -23,20 +32,19 @@ function getPlantEmoji(name) {
 }
 
 function getWateringStatus(plant) {
-  if (plant.overdueForWatering) return { label: 'Overdue!', cls: 'status--overdue' };
-  if (plant.dueForWateringToday) return { label: 'Due Today', cls: 'status--due' };
-  return { label: 'On Schedule', cls: 'status--ok' };
+  if (plant.overdueForWatering) return { label: 'Water Overdue!', cls: 'status--overdue' };
+  if (plant.dueForWateringToday) return { label: 'Water Due Today', cls: 'status--due' };
+  return { label: 'Water On Schedule', cls: 'status--ok' };
 }
 
 export default function PlantCard({ plant, onWater, onDelete }) {
   const emoji = getPlantEmoji(plant.name);
-  const status = getWateringStatus(plant);
+  const waterStatus = getWateringStatus(plant);
+  const health = HEALTH_INFO[plant.healthStatus] || HEALTH_INFO.HEALTHY;
 
   const handleDelete = (e) => {
     e.preventDefault();
-    if (window.confirm(`Delete "${plant.name}"? This cannot be undone.`)) {
-      onDelete(plant.id);
-    }
+    onDelete(plant);
   };
 
   const handleWater = (e) => {
@@ -47,26 +55,58 @@ export default function PlantCard({ plant, onWater, onDelete }) {
   return (
     <div className={`plant-card ${plant.overdueForWatering ? 'plant-card--overdue' : ''}`}>
       <Link to={`/plants/${plant.id}`} className="plant-card-link">
-        <div className="plant-card-emoji">{emoji}</div>
+        <div className="plant-card-media">
+          {plant.imageUrl ? (
+            <img
+              src={plant.imageUrl}
+              alt={plant.name}
+              className="plant-card-image"
+              onError={(e) => {
+                e.target.style.display = 'none';
+                e.target.nextSibling.style.display = 'flex';
+              }}
+            />
+          ) : null}
+          <div
+            className="plant-card-emoji-fallback"
+            style={{ display: plant.imageUrl ? 'none' : 'flex' }}
+          >
+            {emoji}
+          </div>
+        </div>
+
         <div className="plant-card-info">
-          <h3 className="plant-card-name">{plant.name}</h3>
+          <div className="plant-card-top-row">
+            <h3 className="plant-card-name">{plant.name}</h3>
+            <span className={`plant-card-health ${health.cls}`}>{health.label}</span>
+          </div>
+
           <p className="plant-card-species">{plant.species}</p>
           <p className="plant-card-location">📍 {plant.location}</p>
+
           <div className="plant-card-meta">
-            <span className={`plant-card-status ${status.cls}`}>
-              {status.label}
+            <span className={`plant-card-status ${waterStatus.cls}`}>
+              {waterStatus.label}
             </span>
             <span className="plant-card-type">
               {plant.plantType === 'INDOOR' ? '🏠 Indoor' : '🌳 Outdoor'}
             </span>
+            {plant.dueForFertilizingToday || plant.overdueForFertilizing ? (
+              <span className="plant-card-pill pill--fertilize">🌿 Fert Due</span>
+            ) : null}
+            {plant.dueForRepotting ? (
+              <span className="plant-card-pill pill--repot">🪴 Repot Due</span>
+            ) : null}
           </div>
+
           {plant.nextWateringDate && (
             <p className="plant-card-next-water">
-              💧 Next: {new Date(plant.nextWateringDate).toLocaleDateString()}
+              💧 Next water: {new Date(plant.nextWateringDate).toLocaleDateString()}
             </p>
           )}
         </div>
       </Link>
+
       <div className="plant-card-actions">
         <button className="btn btn-water" onClick={handleWater} title="Record Watering">
           💧 Water

@@ -40,11 +40,16 @@ public class PlantRequestDTO {
     private String sunlightRequirement;
 
     private String generalNotes;
+    private String imageUrl;
+    private String healthStatus;
+    private Integer fertilizingIntervalDays;
+    private LocalDate lastFertilizedDate;
 
     // Indoor-specific fields
     private String humidityPreference;
     private String potSize;
     private Integer repottingIntervalMonths;
+    private LocalDate lastRepottedDate;
 
     // Outdoor-specific fields
     private String hardinessZone;
@@ -174,5 +179,45 @@ public class PlantRequestDTO {
 
     public void setPruningSeasonNote(String pruningSeasonNote) {
         this.pruningSeasonNote = pruningSeasonNote;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
+
+    public String getHealthStatus() {
+        return healthStatus;
+    }
+
+    public void setHealthStatus(String healthStatus) {
+        this.healthStatus = healthStatus;
+    }
+
+    public Integer getFertilizingIntervalDays() {
+        return fertilizingIntervalDays;
+    }
+
+    public void setFertilizingIntervalDays(Integer fertilizingIntervalDays) {
+        this.fertilizingIntervalDays = fertilizingIntervalDays;
+    }
+
+    public LocalDate getLastFertilizedDate() {
+        return lastFertilizedDate;
+    }
+
+    public void setLastFertilizedDate(LocalDate lastFertilizedDate) {
+        this.lastFertilizedDate = lastFertilizedDate;
+    }
+
+    public LocalDate getLastRepottedDate() {
+        return lastRepottedDate;
+    }
+
+    public void setLastRepottedDate(LocalDate lastRepottedDate) {
+        this.lastRepottedDate = lastRepottedDate;
     }
 }

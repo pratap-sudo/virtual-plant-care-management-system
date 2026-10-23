@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { activityAPI, plantAPI } from '../services/api';
+import { useToast } from '../context/ToastContext';
+import { exportActivitiesToCsv } from '../utils/exportCsv';
 import LoadingSpinner from '../components/LoadingSpinner';
 import EmptyState from '../components/EmptyState';
-import Alert from '../components/Alert';
 import './CareHistory.css';
 
 const ACTIVITY_ICONS = {
@@ -11,17 +12,17 @@ const ACTIVITY_ICONS = {
   FERTILIZING: '🌿',
   PRUNING: '✂️',
   REPOTTING: '🪴',
+  GROWTH_MILESTONE: '🌱',
   OTHER: '📝',
 };
 
 export default function CareHistory() {
   const [searchParams] = useSearchParams();
   const plantIdParam = searchParams.get('plantId');
+  const toast = useToast();
 
   const [activities, setActivities] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [successMsg, setSuccessMsg] = useState('');
 
   // New activity form
   const [plants, setPlants] = useState([]);
@@ -40,7 +41,7 @@ export default function CareHistory() {
 
     request
       .then(res => setActivities(res.data))
-      .catch(err => setError(err.message))
+      .catch(err => toast.error(err.message))
       .finally(() => setLoading(false));
   };
 
@@ -52,7 +53,10 @@ export default function CareHistory() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!form.plantId) { setError('Please select a plant'); return; }
+    if (!form.plantId) {
+      toast.warning('Please select a plant to record care for.');
+      return;
+    }
     setSaving(true);
     try {
       await activityAPI.create({
@@ -61,25 +65,43 @@ export default function CareHistory() {
         activityDate: form.activityDate,
         notes: form.notes,
       });
-      setSuccessMsg('Activity recorded successfully!');
+      const selectedPlant = plants.find(p => p.id === Number(form.plantId));
+      toast.success(
+        selectedPlant
+          ? `Recorded ${form.activityType.toLowerCase()} for "${selectedPlant.name}"! 🌿`
+          : 'Care activity recorded successfully! 🌿'
+      );
       setForm(prev => ({ ...prev, notes: '' }));
       loadActivities();
     } catch (err) {
-      setError(err.message);
+      toast.error(err.message || 'Failed to record activity');
     } finally {
       setSaving(false);
     }
   };
 
+  const handleExport = () => {
+    if (activities.length === 0) {
+      toast.info('No care history records to export.');
+      return;
+    }
+    exportActivitiesToCsv(activities, `plant-care-history-${new Date().toISOString().split('T')[0]}.csv`);
+    toast.success(`Exported ${activities.length} care record(s) to CSV! 📥`);
+  };
+
   return (
     <div className="page">
       <div className="page-header">
-        <h1 className="page-title">📋 Care History</h1>
-        <p className="page-subtitle">Record and review plant care activities</p>
+        <div>
+          <h1 className="page-title">📋 Care History</h1>
+          <p className="page-subtitle">Record and review plant care activities</p>
+        </div>
+        {activities.length > 0 && (
+          <button className="btn-secondary" onClick={handleExport} title="Export as CSV">
+            📥 Export CSV
+          </button>
+        )}
       </div>
-
-      <Alert type="success" message={successMsg} onClose={() => setSuccessMsg('')} />
-      <Alert type="error" message={error} onClose={() => setError('')} />
 
       {/* Record activity form */}
       <div className="history-form-card">
@@ -99,6 +121,7 @@ export default function CareHistory() {
               <option value="FERTILIZING">🌿 Fertilizing</option>
               <option value="PRUNING">✂️ Pruning</option>
               <option value="REPOTTING">🪴 Repotting</option>
+              <option value="GROWTH_MILESTONE">🌱 Growth Milestone / Note</option>
               <option value="OTHER">📝 Other</option>
             </select>
           </div>

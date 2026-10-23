@@ -17,5 +17,11 @@ Write-Host "==========================================================" -Foregro
 Write-Host ""
 
 Set-Location -Path "$PSScriptRoot\backend"
+
+if (-not $env:JAVA_HOME -and (Test-Path "C:\Program Files\Java\jdk-25")) {
+    $env:JAVA_HOME = "C:\Program Files\Java\jdk-25"
+    $env:PATH = "$env:JAVA_HOME\bin;$env:PATH"
+}
+
 .\mvnw.cmd spring-boot:run
 

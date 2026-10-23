@@ -18,6 +18,10 @@ CREATE TABLE IF NOT EXISTS plants (
     last_watered_date     DATE,
     sunlight_requirement  VARCHAR(100) NOT NULL,
     general_notes         TEXT,
+    image_url             TEXT,
+    health_status         VARCHAR(30)  DEFAULT 'HEALTHY',
+    fertilizing_interval_days INTEGER,
+    last_fertilized_date  DATE,
     created_at            TIMESTAMP    NOT NULL DEFAULT NOW(),
     updated_at            TIMESTAMP    NOT NULL DEFAULT NOW()
 );
@@ -27,7 +31,8 @@ CREATE TABLE IF NOT EXISTS indoor_plants (
     id                        BIGINT PRIMARY KEY REFERENCES plants(id) ON DELETE CASCADE,
     humidity_preference       VARCHAR(50),
     pot_size                  VARCHAR(50),
-    repotting_interval_months INTEGER
+    repotting_interval_months INTEGER,
+    last_repotted_date        DATE
 );
 
 -- Outdoor plants table (extends plants)
@@ -43,7 +48,7 @@ CREATE TABLE IF NOT EXISTS outdoor_plants (
 CREATE TABLE IF NOT EXISTS care_activities (
     id            BIGSERIAL PRIMARY KEY,
     plant_id      BIGINT       NOT NULL REFERENCES plants(id) ON DELETE CASCADE,
-    activity_type VARCHAR(50)  NOT NULL CHECK (activity_type IN ('WATERING', 'FERTILIZING', 'PRUNING', 'REPOTTING', 'OTHER')),
+    activity_type VARCHAR(50)  NOT NULL CHECK (activity_type IN ('WATERING', 'FERTILIZING', 'PRUNING', 'REPOTTING', 'GROWTH_MILESTONE', 'OTHER')),
     activity_date DATE         NOT NULL DEFAULT CURRENT_DATE,
     notes         TEXT,
     created_at    TIMESTAMP    NOT NULL DEFAULT NOW()

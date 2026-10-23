@@ -19,15 +19,25 @@ public class PlantResponseDTO {
     private LocalDate nextWateringDate;
     private String sunlightRequirement;
     private String generalNotes;
+    private String imageUrl;
+    private String healthStatus;
     private String careInstructions;   // Polymorphic result from getCareInstructions()
     private boolean overdueForWatering;
     private boolean dueForWateringToday;
+    private Integer fertilizingIntervalDays;
+    private LocalDate lastFertilizedDate;
+    private LocalDate nextFertilizingDate;
+    private boolean dueForFertilizingToday;
+    private boolean overdueForFertilizing;
     private LocalDateTime createdAt;
 
     // Indoor-specific
     private String humidityPreference;
     private String potSize;
     private Integer repottingIntervalMonths;
+    private LocalDate lastRepottedDate;
+    private LocalDate nextRepottingDate;
+    private boolean dueForRepotting;
 
     // Outdoor-specific
     private String hardinessZone;
@@ -205,5 +215,85 @@ public class PlantResponseDTO {
 
     public void setPruningSeasonNote(String pruningSeasonNote) {
         this.pruningSeasonNote = pruningSeasonNote;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
+
+    public String getHealthStatus() {
+        return healthStatus;
+    }
+
+    public void setHealthStatus(String healthStatus) {
+        this.healthStatus = healthStatus;
+    }
+
+    public Integer getFertilizingIntervalDays() {
+        return fertilizingIntervalDays;
+    }
+
+    public void setFertilizingIntervalDays(Integer fertilizingIntervalDays) {
+        this.fertilizingIntervalDays = fertilizingIntervalDays;
+    }
+
+    public LocalDate getLastFertilizedDate() {
+        return lastFertilizedDate;
+    }
+
+    public void setLastFertilizedDate(LocalDate lastFertilizedDate) {
+        this.lastFertilizedDate = lastFertilizedDate;
+    }
+
+    public LocalDate getNextFertilizingDate() {
+        return nextFertilizingDate;
+    }
+
+    public void setNextFertilizingDate(LocalDate nextFertilizingDate) {
+        this.nextFertilizingDate = nextFertilizingDate;
+    }
+
+    public boolean isDueForFertilizingToday() {
+        return dueForFertilizingToday;
+    }
+
+    public void setDueForFertilizingToday(boolean dueForFertilizingToday) {
+        this.dueForFertilizingToday = dueForFertilizingToday;
+    }
+
+    public boolean isOverdueForFertilizing() {
+        return overdueForFertilizing;
+    }
+
+    public void setOverdueForFertilizing(boolean overdueForFertilizing) {
+        this.overdueForFertilizing = overdueForFertilizing;
+    }
+
+    public LocalDate getLastRepottedDate() {
+        return lastRepottedDate;
+    }
+
+    public void setLastRepottedDate(LocalDate lastRepottedDate) {
+        this.lastRepottedDate = lastRepottedDate;
+    }
+
+    public LocalDate getNextRepottingDate() {
+        return nextRepottingDate;
+    }
+
+    public void setNextRepottingDate(LocalDate nextRepottingDate) {
+        this.nextRepottingDate = nextRepottingDate;
+    }
+
+    public boolean isDueForRepotting() {
+        return dueForRepotting;
+    }
+
+    public void setDueForRepotting(boolean dueForRepotting) {
+        this.dueForRepotting = dueForRepotting;
     }
 }

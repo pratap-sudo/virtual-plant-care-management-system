@@ -1,9 +1,21 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { plantAPI } from '../services/api';
+import { useToast } from '../context/ToastContext';
 import Alert from '../components/Alert';
 import LoadingSpinner from '../components/LoadingSpinner';
 import './PlantForm.css';
+
+const PRESET_IMAGES = [
+  { label: 'Monstera 🪴', url: 'https://images.unsplash.com/photo-1614594975525-e45190c55d0b?w=600&auto=format&fit=crop&q=80' },
+  { label: 'Snake Plant 🌿', url: 'https://images.unsplash.com/photo-1593482892290-f54927ae1bf6?w=600&auto=format&fit=crop&q=80' },
+  { label: 'Money Plant 🍀', url: 'https://images.unsplash.com/photo-1596724817791-9070b4c20b8f?w=600&auto=format&fit=crop&q=80' },
+  { label: 'Aloe Vera 🌵', url: 'https://images.unsplash.com/photo-1596547609652-9cf5d8d76921?w=600&auto=format&fit=crop&q=80' },
+  { label: 'Peace Lily 🌸', url: 'https://images.unsplash.com/photo-1593691509543-c55fb32e7355?w=600&auto=format&fit=crop&q=80' },
+  { label: 'Fiddle Leaf 🌳', url: 'https://images.unsplash.com/photo-1545241047-6083a3684587?w=600&auto=format&fit=crop&q=80' },
+  { label: 'Lavender 🪻', url: 'https://images.unsplash.com/photo-1528183429752-a97d0bf99b5a?w=600&auto=format&fit=crop&q=80' },
+  { label: 'Succulent 🪴', url: 'https://images.unsplash.com/photo-1459411552884-841db9b3cc2a?w=600&auto=format&fit=crop&q=80' },
+];
 
 const initialForm = {
   name: '',
@@ -13,11 +25,16 @@ const initialForm = {
   wateringIntervalDays: 7,
   lastWateredDate: '',
   sunlightRequirement: 'Medium',
+  imageUrl: '',
+  healthStatus: 'HEALTHY',
+  fertilizingIntervalDays: 30,
+  lastFertilizedDate: '',
   generalNotes: '',
   // Indoor
   humidityPreference: '',
   potSize: '',
   repottingIntervalMonths: '',
+  lastRepottedDate: '',
   // Outdoor
   hardinessZone: '',
   isFrostTolerant: '',
@@ -28,15 +45,24 @@ const initialForm = {
 export default function PlantForm() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
+  const toast = useToast();
   const isEdit = Boolean(id);
+  const prefill = location.state?.prefill;
 
-  const [form, setForm] = useState(initialForm);
+  const [form, setForm] = useState(() => {
+    if (prefill) {
+      return { ...initialForm, ...prefill };
+    }
+    return initialForm;
+  });
+
   const [loading, setLoading] = useState(isEdit);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
   const [fieldErrors, setFieldErrors] = useState({});
+  const [prefillAlert, setPrefillAlert] = useState(Boolean(prefill));
 
-  // Load existing plant data for edit mode
   useEffect(() => {
     if (!isEdit) return;
     plantAPI.getById(id)
@@ -50,10 +76,15 @@ export default function PlantForm() {
           wateringIntervalDays: p.wateringIntervalDays || 7,
           lastWateredDate: p.lastWateredDate || '',
           sunlightRequirement: p.sunlightRequirement || 'Medium',
+          imageUrl: p.imageUrl || '',
+          healthStatus: p.healthStatus || 'HEALTHY',
+          fertilizingIntervalDays: p.fertilizingIntervalDays || 30,
+          lastFertilizedDate: p.lastFertilizedDate || '',
           generalNotes: p.generalNotes || '',
           humidityPreference: p.humidityPreference || '',
           potSize: p.potSize || '',
           repottingIntervalMonths: p.repottingIntervalMonths || '',
+          lastRepottedDate: p.lastRepottedDate || '',
           hardinessZone: p.hardinessZone || '',
           isFrostTolerant: p.isFrostTolerant != null ? String(p.isFrostTolerant) : '',
           soilTypePreference: p.soilTypePreference || '',
@@ -68,6 +99,10 @@ export default function PlantForm() {
     const { name, value } = e.target;
     setForm(prev => ({ ...prev, [name]: value }));
     setFieldErrors(prev => ({ ...prev, [name]: '' }));
+  };
+
+  const handleApplyPreset = (url) => {
+    setForm(prev => ({ ...prev, imageUrl: url }));
   };
 
   const validate = () => {
@@ -87,27 +122,35 @@ export default function PlantForm() {
     const errs = validate();
     if (Object.keys(errs).length > 0) {
       setFieldErrors(errs);
+      toast.warning('Please complete the highlighted required fields.');
       return;
     }
 
     const payload = {
       ...form,
       wateringIntervalDays: Number(form.wateringIntervalDays),
+      fertilizingIntervalDays: form.fertilizingIntervalDays ? Number(form.fertilizingIntervalDays) : null,
       repottingIntervalMonths: form.repottingIntervalMonths ? Number(form.repottingIntervalMonths) : null,
       isFrostTolerant: form.isFrostTolerant === 'true' ? true : form.isFrostTolerant === 'false' ? false : null,
       lastWateredDate: form.lastWateredDate || null,
+      lastFertilizedDate: form.lastFertilizedDate || null,
+      lastRepottedDate: form.lastRepottedDate || null,
+      imageUrl: form.imageUrl?.trim() || null,
     };
 
     setSaving(true);
     try {
       if (isEdit) {
         await plantAPI.update(id, payload);
+        toast.success(`"${payload.name}" updated successfully! 🌿`);
       } else {
         await plantAPI.create(payload);
+        toast.success(`"${payload.name}" added to your garden! 🌱`);
       }
       navigate('/plants');
     } catch (err) {
       setError(err.message);
+      toast.error(err.message || 'Failed to save plant');
     } finally {
       setSaving(false);
     }
@@ -122,9 +165,73 @@ export default function PlantForm() {
         <p className="page-subtitle">{isEdit ? 'Update your plant details' : 'Add a new plant to your collection'}</p>
       </div>
 
+      {prefillAlert && (
+        <Alert
+          type="info"
+          message={`✨ Pre-filled with standard care specifications from the Plant Guide for "${form.name}". Customize any field and save!`}
+          onClose={() => setPrefillAlert(false)}
+        />
+      )}
+
       <Alert type="error" message={error} onClose={() => setError('')} />
 
       <form className="plant-form" onSubmit={handleSubmit}>
+        {/* Photo & Visuals Section */}
+        <div className="form-section">
+          <h2 className="form-section-title">📸 Plant Photo</h2>
+          <div className="form-grid">
+            <div className="form-group form-group--full">
+              <label>Image URL</label>
+              <input
+                name="imageUrl"
+                value={form.imageUrl}
+                onChange={handleChange}
+                placeholder="https://images.unsplash.com/photo-..."
+              />
+              <span className="field-hint">Paste an image URL or choose one of our curated plant presets below:</span>
+            </div>
+
+            <div className="form-group form-group--full">
+              <div className="preset-buttons">
+                {PRESET_IMAGES.map((preset, idx) => (
+                  <button
+                    key={idx}
+                    type="button"
+                    className={`preset-btn ${form.imageUrl === preset.url ? 'preset-btn--active' : ''}`}
+                    onClick={() => handleApplyPreset(preset.url)}
+                  >
+                    {preset.label}
+                  </button>
+                ))}
+                {form.imageUrl && (
+                  <button
+                    type="button"
+                    className="preset-btn preset-btn--clear"
+                    onClick={() => handleApplyPreset('')}
+                  >
+                    ✕ Clear Photo
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {form.imageUrl && (
+              <div className="form-group form-group--full">
+                <div className="image-preview-container">
+                  <span className="image-preview-label">Live Photo Preview:</span>
+                  <img
+                    src={form.imageUrl}
+                    alt="Preview"
+                    className="image-preview"
+                    onError={(e) => { e.target.style.display = 'none'; }}
+                  />
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Basic Information */}
         <div className="form-section">
           <h2 className="form-section-title">Basic Information</h2>
           <div className="form-grid">
@@ -151,16 +258,14 @@ export default function PlantForm() {
               {fieldErrors.location && <span className="field-error">{fieldErrors.location}</span>}
             </div>
             <div className="form-group">
-              <label>Watering Every (days) *</label>
-              <input
-                type="number" name="wateringIntervalDays" min="1" max="365"
-                value={form.wateringIntervalDays} onChange={handleChange}
-              />
-              {fieldErrors.wateringIntervalDays && <span className="field-error">{fieldErrors.wateringIntervalDays}</span>}
-            </div>
-            <div className="form-group">
-              <label>Last Watered Date</label>
-              <input type="date" name="lastWateredDate" value={form.lastWateredDate} onChange={handleChange} />
+              <label>Health Status</label>
+              <select name="healthStatus" value={form.healthStatus} onChange={handleChange}>
+                <option value="THRIVING">🌟 Thriving (Active growth, vigorous)</option>
+                <option value="HEALTHY">💚 Healthy (Normal, good shape)</option>
+                <option value="NEEDS_ATTENTION">⚠️ Needs Attention (Drooping / dry / yellowing)</option>
+                <option value="SICK">🥀 Sick / Unwell (Pests / leaf damage)</option>
+                <option value="DORMANT">💤 Dormant (Winter rest period)</option>
+              </select>
             </div>
             <div className="form-group">
               <label>Sunlight Requirement *</label>
@@ -174,7 +279,39 @@ export default function PlantForm() {
             <div className="form-group form-group--full">
               <label>General Notes</label>
               <textarea name="generalNotes" value={form.generalNotes} onChange={handleChange}
-                placeholder="Any notes about this plant..." rows={3} />
+                placeholder="Any notes about this plant..." rows={2} />
+            </div>
+          </div>
+        </div>
+
+        {/* Care Schedules */}
+        <div className="form-section">
+          <h2 className="form-section-title">💧 Care Schedules</h2>
+          <div className="form-grid">
+            <div className="form-group">
+              <label>Watering Every (days) *</label>
+              <input
+                type="number" name="wateringIntervalDays" min="1" max="365"
+                value={form.wateringIntervalDays} onChange={handleChange}
+              />
+              {fieldErrors.wateringIntervalDays && <span className="field-error">{fieldErrors.wateringIntervalDays}</span>}
+            </div>
+            <div className="form-group">
+              <label>Last Watered Date</label>
+              <input type="date" name="lastWateredDate" value={form.lastWateredDate} onChange={handleChange} />
+            </div>
+
+            <div className="form-group">
+              <label>Fertilizing Every (days)</label>
+              <input
+                type="number" name="fertilizingIntervalDays" min="1" max="365"
+                value={form.fertilizingIntervalDays} onChange={handleChange}
+                placeholder="e.g. 30 (monthly)"
+              />
+            </div>
+            <div className="form-group">
+              <label>Last Fertilized Date</label>
+              <input type="date" name="lastFertilizedDate" value={form.lastFertilizedDate} onChange={handleChange} />
             </div>
           </div>
         </div>
@@ -207,6 +344,10 @@ export default function PlantForm() {
                 <input type="number" name="repottingIntervalMonths" min="1" max="60"
                   value={form.repottingIntervalMonths} onChange={handleChange}
                   placeholder="e.g. 12" />
+              </div>
+              <div className="form-group">
+                <label>Last Repotted Date</label>
+                <input type="date" name="lastRepottedDate" value={form.lastRepottedDate} onChange={handleChange} />
               </div>
             </div>
           </div>

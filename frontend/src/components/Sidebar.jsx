@@ -1,4 +1,5 @@
 import { NavLink } from 'react-router-dom';
+import { useTheme } from '../context/ThemeContext';
 import './Sidebar.css';
 
 const navItems = [
@@ -11,6 +12,8 @@ const navItems = [
 ];
 
 export default function Sidebar() {
+  const { theme, toggleTheme } = useTheme();
+
   return (
     <aside className="sidebar">
       <div className="sidebar-logo">
@@ -20,6 +23,7 @@ export default function Sidebar() {
           <div className="sidebar-subtitle">Virtual Plant Manager</div>
         </div>
       </div>
+
       <nav className="sidebar-nav">
         {navItems.map((item) => (
           <NavLink
@@ -34,6 +38,19 @@ export default function Sidebar() {
           </NavLink>
         ))}
       </nav>
+
+      {/* Theme Switcher & Footer */}
+      <div className="sidebar-theme-container">
+        <button
+          type="button"
+          className="theme-toggle-btn"
+          onClick={toggleTheme}
+          aria-label="Toggle light or dark theme"
+        >
+          {theme === 'dark' ? '☀️ Light Mode' : '🌙 Dark Mode'}
+        </button>
+      </div>
+
       <div className="sidebar-footer">
         <p>🌍 OOP Course Project</p>
         <p>Java Spring Boot + React</p>
